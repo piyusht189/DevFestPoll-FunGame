@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.koushikdutta.ion.Ion;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -23,16 +25,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static java.sql.Types.NULL;
-
 public class MainActivity extends AppCompatActivity {
   EditText name,email;
     String out;
+
     int min = 65;
     int max = 200;
     String name1,email1;
@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
-     if(!loademail().equals(NULL))
+        Ion.getDefault(this).configure().setLogging("ion-sample", Log.DEBUG);
+     if(loadverify().equals("1"))
      {
          startActivity(new Intent(MainActivity.this,showid.class));
          finish();
@@ -51,19 +52,16 @@ public class MainActivity extends AppCompatActivity {
     public void register(View view){
         name=(EditText) findViewById(R.id.name);
         email=(EditText) findViewById(R.id.email);
+        name1=name.getText().toString();
+        email1=email.getText().toString();
         Random r = new Random();
         int id = r.nextInt(max - min + 1) + min;
-        try {
-            name1 = URLEncoder.encode(name.getText().toString(), "utf-8");
-            email1 = URLEncoder.encode(email.getText().toString(), "utf-8");
-        }catch (Exception e){
-
-        }
-        sendid(id,name1,email1);
+       // sendid(id,name1,email1);
 
         Intent g=new Intent(MainActivity.this,showid.class);
-        saveemail(email.getText().toString());
-        savename(name.getText().toString());
+        saveemail(email1);
+        saveverify();
+        savename(name1);
         saveid(String.valueOf(id));
         startActivity(g);
         finish();
@@ -101,11 +99,31 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
 
         }
+
+
+
+
     }
+
+
 
     protected void saveemail(String email){
         String FILENAME1 = "auth_email.txt";
         String verifyme=email;
+
+        try {
+            FileOutputStream fos1 = getApplication().openFileOutput(FILENAME1, Context.MODE_PRIVATE);
+            fos1.write(verifyme.getBytes());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    protected void saveverify(){
+        String FILENAME1 = "auth_verify.txt";
+        String verifyme="1";
 
         try {
             FileOutputStream fos1 = getApplication().openFileOutput(FILENAME1, Context.MODE_PRIVATE);
@@ -148,6 +166,26 @@ public class MainActivity extends AppCompatActivity {
 
     protected String loademail() {
         String FILENAME = "auth_email.txt";
+
+        try {
+            out="";
+            FileInputStream fis1 = getApplication().openFileInput(FILENAME);
+            BufferedReader br1 = new BufferedReader(new InputStreamReader(fis1));
+            String sLine1 = null;
+
+            while (((sLine1 = br1.readLine()) != null)) {
+                out += sLine1;
+            }
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return out;
+    }
+    protected String loadverify() {
+        String FILENAME = "auth_verify.txt";
 
         try {
             out="";

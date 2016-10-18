@@ -22,7 +22,12 @@ String name,email,out;
         pollid=(TextView) findViewById(R.id.poll_id);
         selectedid=(TextView) findViewById(R.id.selectedid);
         pollid.setText(loadid());
-        if(!selectedid.getText().equals("id2")){
+        if(!selectedid.getText().equals("-")){
+
+
+
+        }
+        else{
 
 
 
